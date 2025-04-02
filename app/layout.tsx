@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Almarai } from "next/font/google";
+import { Zain } from "next/font/google";
 import "./globals.css";
 
-const almarai = Almarai({
+const almarai = Zain({
   subsets: ["arabic"],
   weight: ["300", "400", "700"],
   variable: "--font-almarai",

@@ -10,23 +10,48 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { DollarSign, Euro } from "lucide-react";
+import Image from "next/image";
 
 // Currency data with symbols and codes
 const currencies = [
-  { code: "USD", name: "دولار أمريكي", symbol: "$", icon: DollarSign },
-  { code: "EUR", name: "يورو", symbol: "€", icon: Euro },
-  { code: "TRY", name: "ليرة تركية", symbol: "₺" },
-  { code: "SYP", name: "ليرة سورية", symbol: "S.P" },
+  {
+    flag: "/flags/us.svg",
+    code: "USD",
+    name: "دولار أمريكي",
+    symbol: "$",
+    icon: DollarSign,
+  },
+  { flag: "/flags/eu.svg", code: "EUR", name: "يورو", symbol: "€", icon: Euro },
+  { flag: "/flags/tr.svg", code: "TRY", name: "ليرة تركية", symbol: "₺" },
+  { flag: "/flags/sy.svg", code: "SYP", name: "ليرة سورية", symbol: "S.P" },
 ];
 
 // Mock exchange rates (in a real app, you would fetch these from an API)
-type ExchangeRates = Record<string, Record<string, number>>;
-
+type ExchangeRates = Record<
+  string,
+  Record<string, { sell: number; buy: number }>
+>;
 const exchangeRates: ExchangeRates = {
-  USD: { EUR: 0.92, TRY: 30.89, SYP: 12950.0 },
-  EUR: { USD: 1.09, TRY: 33.58, SYP: 14076.0 },
-  TRY: { USD: 0.032, EUR: 0.03, SYP: 419.23 },
-  SYP: { USD: 0.000077, EUR: 0.000071, TRY: 0.0024 },
+  USD: {
+    EUR: { sell: 0.92, buy: 0.9 },
+    TRY: { sell: 30.89, buy: 30.5 },
+    SYP: { sell: 12950.0, buy: 12900.0 },
+  },
+  EUR: {
+    USD: { sell: 1.09, buy: 1.07 },
+    TRY: { sell: 33.58, buy: 33.2 },
+    SYP: { sell: 14076.0, buy: 14000.0 },
+  },
+  TRY: {
+    USD: { sell: 0.032, buy: 0.03 },
+    EUR: { sell: 0.03, buy: 0.028 },
+    SYP: { sell: 419.23, buy: 415.0 },
+  },
+  SYP: {
+    USD: { sell: 0.000077, buy: 0.000075 },
+    EUR: { sell: 0.000071, buy: 0.000069 },
+    TRY: { sell: 0.0024, buy: 0.0022 },
+  },
 };
 
 export default function CurrencyExchangeHero() {
@@ -54,7 +79,7 @@ export default function CurrencyExchangeHero() {
         <div className="flex items-center bg-gray-800/70 absolute left-0 top-0 h-[400px] w-full justify-center  z-10">
           <div className="flex flex-col items-center text-center space-y-4 mb-12">
             <h1 className="text-3xl text- text-yellow-400 font-bold tracking-tighter sm:text-4xl md:text-7xl mb-8">
-              ويسترن يونيون
+              الصافي للصرافة والحوالات المالية
             </h1>
             <p className="max-w-[700px] text-background md:text-xl">
               استلام وارسال الحوالات المالية من كافة دول العالم
@@ -87,6 +112,12 @@ export default function CurrencyExchangeHero() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 relative">
           {currenciesToShow.map((currency) => {
             const rate = exchangeRates[baseCurrency][currency.code];
+            const baseSymbol = currencies.find(
+              (c) => c.code === baseCurrency
+            )?.symbol;
+            const shouldInvert = rate.buy < 1;
+            const displayRate = shouldInvert ? 1 / rate.buy : rate.buy;
+            const displaySellRate = shouldInvert ? 1 / rate.sell : rate.sell;
 
             return (
               <Card
@@ -96,11 +127,13 @@ export default function CurrencyExchangeHero() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
-                      <div className="p-2 rounded-full bg-muted aspect-square w-[50px] flex items-center justify-center">
-                        <span className="text-2xl font-bold text-yellow-500">
-                          {currency.symbol}
-                        </span>
-                      </div>
+                      <Image
+                        className="me-2"
+                        width={80}
+                        height={60}
+                        src={currency.flag}
+                        alt={currency.name}
+                      ></Image>
                       <div>
                         <h3 className="font-bold ">{currency.name}</h3>
                         <p className="text-sm text-muted-foreground">
@@ -108,23 +141,72 @@ export default function CurrencyExchangeHero() {
                         </p>
                       </div>
                     </div>
-                    <div className="text-2xl font-bold">
-                      <span className="ms-2">{currency.symbol}</span>
-                      <span>
-                        {rate > 1 ? Number(rate).toFixed(2) : Number(rate)}
-                      </span>
+                    <div className="flex flex-col gap-2">
+                      <div className="text-xl">
+                        <span className="ms-2">
+                          {shouldInvert ? baseSymbol : currency.symbol}
+                        </span>
+                        <span>
+                          {displayRate > 1
+                            ? Number(displayRate).toFixed(2)
+                            : Number(displayRate).toFixed(4)}
+                        </span>
+                        <span className="ms-2 text-green-500 text-sm">
+                          شراء
+                        </span>
+                      </div>
+                      <div className="text-xl">
+                        <span className="ms-2">
+                          {shouldInvert ? baseSymbol : currency.symbol}
+                        </span>
+                        <span>
+                          {displaySellRate > 1
+                            ? Number(displaySellRate).toFixed(2)
+                            : Number(displaySellRate).toFixed(4)}
+                        </span>
+                        <span className="ms-2 text-red-500 text-sm">مبيع</span>
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
                     <p className="text-muted-foreground">
-                      1 {baseCurrency} = {currency.symbol}
-                      {Number(rate).toFixed(4)} {currency.code}
+                      {shouldInvert ? (
+                        <>
+                          <span>{baseCurrency}</span>
+                          <span> = </span>
+                          <span>{currency.symbol}</span>
+                          <span>{rate.buy.toFixed(4)}</span>
+                          <span> {currency.code}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>{currency.code}</span>
+                          <span> = </span>
+                          <span>{baseSymbol}</span>
+                          <span>{(1 / rate.buy).toFixed(4)}</span>
+                          <span> {baseCurrency}</span>
+                        </>
+                      )}
                     </p>
                     <p className="text-muted-foreground">
-                      1 {currency.code} ={" "}
-                      {currencies.find((c) => c.code === baseCurrency)?.symbol}
-                      {(1 / rate).toFixed(4)} {baseCurrency}
+                      {shouldInvert ? (
+                        <>
+                          <span>{baseCurrency}</span>
+                          <span> = </span>
+                          <span>{currency.symbol}</span>
+                          <span>{rate.buy.toFixed(4)}</span>
+                          <span> {currency.code}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>{currency.code}</span>
+                          <span> = </span>
+                          <span>{baseSymbol}</span>
+                          <span>{(1 / rate.buy).toFixed(4)}</span>
+                          <span> {baseCurrency}</span>
+                        </>
+                      )}
                     </p>
                   </div>
                 </CardContent>
