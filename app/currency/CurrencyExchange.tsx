@@ -116,8 +116,9 @@ export default function CurrencyExchangeHero() {
               (c) => c.code === baseCurrency
             )?.symbol;
             const shouldInvert = rate.buy < 1;
-            const displayRate = shouldInvert ? 1 / rate.buy : rate.buy;
-            const displaySellRate = shouldInvert ? 1 / rate.sell : rate.sell;
+
+            const displayRate = shouldInvert ? 1 / rate.sell : rate.buy;
+            const displaySellRate = shouldInvert ? 1 / rate.buy : rate.sell;
 
             return (
               <Card
