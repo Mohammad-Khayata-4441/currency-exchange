@@ -135,14 +135,14 @@ export default function CurrencyExchangeHero() {
                         alt={currency.name}
                       ></Image>
                       <div>
-                        <h3 className="font-bold ">{currency.name}</h3>
+                        <h3 className="font-bold text-xl">{currency.name}</h3>
                         <p className="text-sm text-muted-foreground">
                           {currency.code}
                         </p>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <div className="text-xl">
+                      <div className="text-2xl">
                         <span className="ms-2">
                           {shouldInvert ? baseSymbol : currency.symbol}
                         </span>
@@ -155,7 +155,7 @@ export default function CurrencyExchangeHero() {
                           شراء
                         </span>
                       </div>
-                      <div className="text-xl">
+                      <div className="text-2xl">
                         <span className="ms-2">
                           {shouldInvert ? baseSymbol : currency.symbol}
                         </span>
