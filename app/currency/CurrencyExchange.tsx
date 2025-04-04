@@ -205,7 +205,7 @@ export default function CurrencyExchangeHero({
             </Card>
             <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
               <Image
-                src="/logos/ria.png"
+                src="/logos/sham.png"
                 alt="us"
                 height={80}
                 width={120}
