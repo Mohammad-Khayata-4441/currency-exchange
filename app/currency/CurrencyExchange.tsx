@@ -11,6 +11,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Currency, CurrencyExchange } from "./types/currency.types";
+import Marquee from "react-fast-marquee";
 
 // Currency data with symbols and codes
 
@@ -92,6 +93,7 @@ export default function CurrencyExchangeHero({
             </SelectContent>
           </Select>
         </div>
+
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 relative">
           {currenciesToShow.map((currency) => {
             const currencyExchange = currentCurrencyExchanges.find(
@@ -169,11 +171,80 @@ export default function CurrencyExchangeHero({
             );
           })}
         </div>
+      </div>
+      <div dir="rtl" className="my-12">
+        <Marquee speed={200}>
+          <div className="flex gap-16 ">
+            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
+              <Image
+                src="/logos/wu.jpg"
+                alt="us"
+                height={80}
+                width={120}
+                className="object-contain h-full w-auto"
+              />
+            </Card>
+            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
+              <Image
+                src="/logos/usdt.png"
+                alt="us"
+                height={80}
+                width={120}
+                className="object-contain h-full w-auto"
+              />
+            </Card>
 
-        <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>اخر تحديث للأسعار بتاريخ : {currentDate}</p>
-          <p className="mt-1 text-lg">حلب - الجميلية - شارع جامع الصديق</p>
-        </div>
+            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
+              <Image
+                src="/logos/bnb.png"
+                alt="us"
+                height={80}
+                width={120}
+                className="object-contain h-full w-auto"
+              />
+            </Card>
+            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
+              <Image
+                src="/logos/ria.png"
+                alt="us"
+                height={80}
+                width={120}
+                className="object-contain h-full w-auto"
+              />
+            </Card>
+            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
+              <Image
+                src="/logos/eth.png"
+                alt="us"
+                height={80}
+                width={120}
+                className="object-contain h-full w-auto"
+              />
+            </Card>
+            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
+              <Image
+                src="/logos/whish.jpg"
+                alt="us"
+                height={80}
+                width={120}
+                className="object-contain h-full w-auto"
+              />
+            </Card>
+            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
+              <Image
+                src="/logos/moneygram.png"
+                alt="us"
+                height={80}
+                width={120}
+                className="object-contain h-full w-auto"
+              />
+            </Card>
+          </div>
+        </Marquee>
+      </div>
+      <div className="mt-8 text-center text-sm text-muted-foreground">
+        <p>اخر تحديث للأسعار بتاريخ : {currentDate}</p>
+        <p className="mt-1 text-lg">حلب - الجميلية - شارع جامع الصديق</p>
       </div>
     </section>
   );
