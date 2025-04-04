@@ -9,57 +9,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { DollarSign, Euro } from "lucide-react";
 import Image from "next/image";
+import { Currency, CurrencyExchange } from "./types/currency.types";
 
 // Currency data with symbols and codes
-const currencies = [
-  {
-    flag: "/flags/us.svg",
-    code: "USD",
-    name: "دولار أمريكي",
-    symbol: "$",
-    icon: DollarSign,
-  },
-  { flag: "/flags/eu.svg", code: "EUR", name: "يورو", symbol: "€", icon: Euro },
-  { flag: "/flags/tr.svg", code: "TRY", name: "ليرة تركية", symbol: "₺" },
-  { flag: "/flags/sy.svg", code: "SYP", name: "ليرة سورية", symbol: "S.P" },
-];
 
-// Mock exchange rates (in a real app, you would fetch these from an API)
-type ExchangeRates = Record<
-  string,
-  Record<string, { sell: number; buy: number }>
->;
-const exchangeRates: ExchangeRates = {
-  USD: {
-    EUR: { sell: 0.92, buy: 0.9 },
-    TRY: { sell: 30.89, buy: 30.5 },
-    SYP: { sell: 12950.0, buy: 12900.0 },
-  },
-  EUR: {
-    USD: { sell: 1.09, buy: 1.07 },
-    TRY: { sell: 33.58, buy: 33.2 },
-    SYP: { sell: 14076.0, buy: 14000.0 },
-  },
-  TRY: {
-    USD: { sell: 0.032, buy: 0.03 },
-    EUR: { sell: 0.03, buy: 0.028 },
-    SYP: { sell: 419.23, buy: 415.0 },
-  },
-  SYP: {
-    USD: { sell: 0.000077, buy: 0.000075 },
-    EUR: { sell: 0.000071, buy: 0.000069 },
-    TRY: { sell: 0.0024, buy: 0.0022 },
-  },
-};
+export default function CurrencyExchangeHero({
+  currencies,
+  currentDate,
+  currenciesExchange,
+}: {
+  currencies: Currency[];
+  currenciesExchange: CurrencyExchange[];
+  currentDate: string;
+}) {
+  const [baseCurrency, setBaseCurrency] = useState(
+    currencies.find((c) => c.isMain)?.id
+  );
 
-export default function CurrencyExchangeHero() {
-  const [baseCurrency, setBaseCurrency] = useState("USD");
+  const currentCurrencyExchanges = currenciesExchange.filter(
+    (c) => c.sourceCurrency.id === baseCurrency
+  );
 
   // Get currencies to display (all except the base currency)
   const currenciesToShow = currencies
-    .filter((c) => c.code !== baseCurrency)
+    .filter((c) =>
+      currentCurrencyExchanges.some((ex) => ex.targetCurrency.id === c.id)
+    )
     .slice(0, 3);
 
   return (
@@ -102,8 +78,15 @@ export default function CurrencyExchangeHero() {
             </SelectTrigger>
             <SelectContent>
               {currencies.map((currency) => (
-                <SelectItem key={currency.code} value={currency.code}>
-                  {currency.code} - {currency.name}
+                <SelectItem key={currency.id} value={currency.id}>
+                  <Image
+                    className="me-2 rounded"
+                    height={15}
+                    width={30}
+                    src={`/flags/${currency.flag}.svg`}
+                    alt=""
+                  />{" "}
+                  {currency.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -111,14 +94,22 @@ export default function CurrencyExchangeHero() {
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 relative">
           {currenciesToShow.map((currency) => {
-            const rate = exchangeRates[baseCurrency][currency.code];
+            const currencyExchange = currentCurrencyExchanges.find(
+              (c) =>
+                c.sourceCurrency.id === baseCurrency &&
+                c.targetCurrency.id === currency.id
+            );
+            if (!currencyExchange) return null;
+
+            const rate = currencyExchange.price;
+
             const baseSymbol = currencies.find(
               (c) => c.code === baseCurrency
             )?.symbol;
-            const shouldInvert = rate.buy < 1;
+            const shouldInvert = false;
 
-            const displayRate = shouldInvert ? 1 / rate.sell : rate.buy;
-            const displaySellRate = shouldInvert ? 1 / rate.buy : rate.sell;
+            const displayRate = shouldInvert ? 1 / rate : rate;
+            const displaySellRate = shouldInvert ? 1 / rate : rate;
 
             return (
               <Card
@@ -132,7 +123,7 @@ export default function CurrencyExchangeHero() {
                         className="me-2"
                         width={80}
                         height={60}
-                        src={currency.flag}
+                        src={`/flags/${currency.flag}.svg`}
                         alt={currency.name}
                       ></Image>
                       <div>
@@ -144,7 +135,7 @@ export default function CurrencyExchangeHero() {
                     </div>
                     <div className="flex flex-col gap-2">
                       <div className="text-2xl">
-                        <span className="ms-2">
+                        <span className="ms-2" dir="rtl">
                           {shouldInvert ? baseSymbol : currency.symbol}
                         </span>
                         <span>
@@ -157,58 +148,21 @@ export default function CurrencyExchangeHero() {
                         </span>
                       </div>
                       <div className="text-2xl">
-                        <span className="ms-2">
+                        <span className="ms-2" dir="rtl">
                           {shouldInvert ? baseSymbol : currency.symbol}
                         </span>
                         <span>
                           {displaySellRate > 1
-                            ? Number(displaySellRate).toFixed(2)
-                            : Number(displaySellRate).toFixed(4)}
+                            ? Number(
+                                displaySellRate + currencyExchange.gap
+                              ).toFixed(2)
+                            : Number(
+                                displaySellRate + currencyExchange.gap
+                              ).toFixed(4)}
                         </span>
                         <span className="ms-2 text-red-500 text-sm">مبيع</span>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <p className="text-muted-foreground">
-                      {shouldInvert ? (
-                        <>
-                          <span>{baseCurrency}</span>
-                          <span> = </span>
-                          <span>{currency.symbol}</span>
-                          <span>{rate.buy.toFixed(4)}</span>
-                          <span> {currency.code}</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>{currency.code}</span>
-                          <span> = </span>
-                          <span>{baseSymbol}</span>
-                          <span>{(1 / rate.buy).toFixed(4)}</span>
-                          <span> {baseCurrency}</span>
-                        </>
-                      )}
-                    </p>
-                    <p className="text-muted-foreground">
-                      {shouldInvert ? (
-                        <>
-                          <span>{baseCurrency}</span>
-                          <span> = </span>
-                          <span>{currency.symbol}</span>
-                          <span>{rate.buy.toFixed(4)}</span>
-                          <span> {currency.code}</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>{currency.code}</span>
-                          <span> = </span>
-                          <span>{baseSymbol}</span>
-                          <span>{(1 / rate.buy).toFixed(4)}</span>
-                          <span> {baseCurrency}</span>
-                        </>
-                      )}
-                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -217,10 +171,7 @@ export default function CurrencyExchangeHero() {
         </div>
 
         <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>
-            اخر تحديث للأسعار بتاريخ : {new Date().toLocaleDateString()}{" "}
-            {new Date().toLocaleTimeString()}
-          </p>
+          <p>اخر تحديث للأسعار بتاريخ : {currentDate}</p>
           <p className="mt-1 text-lg">حلب - الجميلية - شارع جامع الصديق</p>
         </div>
       </div>
