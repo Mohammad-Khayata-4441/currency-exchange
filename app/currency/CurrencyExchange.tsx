@@ -12,9 +12,82 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Currency, CurrencyExchange } from "./types/currency.types";
 import Marquee from "react-fast-marquee";
+import { Input } from "@/components/ui/input";
 
 // Currency data with symbols and codes
 
+const generateCurrenciesRateMap = (
+  currencies: Currency[],
+  currenciesExchange: CurrencyExchange[]
+): Record<string, Array<CurrencyExchange>> => {
+  const currenciesRateMap: Record<string, Array<CurrencyExchange>> = {};
+
+  // Initialize the map with empty arrays for each currency
+  currencies.forEach((currency) => {
+    currenciesRateMap[currency.id] = [];
+  });
+
+  // Process direct exchanges
+  currenciesExchange.forEach((exchange) => {
+    const sourceCurrencyId = exchange.sourceCurrency.id;
+
+    // Add the exchange to the source currency's array
+    if (!currenciesRateMap[sourceCurrencyId]) {
+      currenciesRateMap[sourceCurrencyId] = [];
+    }
+
+    currenciesRateMap[sourceCurrencyId].push(exchange);
+  });
+
+  // Fill in missing exchanges by calculating reverse rates
+  currencies.forEach((sourceCurrency) => {
+    currencies.forEach((targetCurrency) => {
+      // Skip if it's the same currency
+      if (sourceCurrency.id === targetCurrency.id) {
+        return;
+      }
+
+      // Check if exchange already exists
+      const exchangeExists = currenciesRateMap[sourceCurrency.id].some(
+        (exchange) => exchange.targetCurrency.id === targetCurrency.id
+      );
+
+      if (!exchangeExists) {
+        // Look for reverse exchange
+        const reverseExchange = currenciesRateMap[targetCurrency.id]?.find(
+          (exchange) => exchange.targetCurrency.id === sourceCurrency.id
+        );
+
+        if (reverseExchange) {
+          const originalBuyPrice = reverseExchange.price;
+          const originalSellPrice = originalBuyPrice + reverseExchange.gap;
+
+          const reverseBuyPrice = 1 / originalSellPrice;
+          const reverseSellPrice = 1 / originalBuyPrice;
+
+          // New gap is the difference between reverse sell and reverse buy
+          const reverseGap = reverseSellPrice - reverseBuyPrice;
+
+          // Calculate reverse rate
+          const calculatedExchange: CurrencyExchange = {
+            id: `calculated-${sourceCurrency.id}-${targetCurrency.id}`,
+            sourceCurrency: sourceCurrency,
+            targetCurrency: targetCurrency,
+            price: 1 / reverseExchange.price,
+            gap: reverseGap, // May need different logic for gap
+            reverse: true,
+            createdAt: reverseExchange.createdAt,
+            updatedAt: reverseExchange.updatedAt,
+          };
+
+          currenciesRateMap[sourceCurrency.id].push(calculatedExchange);
+        }
+      }
+    });
+  });
+
+  return currenciesRateMap;
+};
 export default function CurrencyExchangeHero({
   currencies,
   currentDate,
@@ -24,20 +97,23 @@ export default function CurrencyExchangeHero({
   currenciesExchange: CurrencyExchange[];
   currentDate: string;
 }) {
+  // const [reverse, setReverse] = useState(false);
+  const [amount, setAmount] = useState(1);
   const [baseCurrency, setBaseCurrency] = useState(
     currencies.find((c) => c.isMain)?.id
   );
 
-  const currentCurrencyExchanges = currenciesExchange.filter(
-    (c) => c.sourceCurrency.id === baseCurrency
-  );
-
   // Get currencies to display (all except the base currency)
-  const currenciesToShow = currencies
-    .filter((c) =>
-      currentCurrencyExchanges.some((ex) => ex.targetCurrency.id === c.id)
-    )
-    .slice(0, 3);
+
+  const marqueeLogos = [
+    { src: "/logos/wu.jpg", title: "Western Union" },
+    { src: "/logos/usdt.png", title: "USDT" },
+    { src: "/logos/bnb.png", title: "BNB" },
+    { src: "/logos/sham.png", title: "Sham" },
+    // { src: "/logos/eth.png", title: "Ethereum" },
+    { src: "/logos/whish.jpg", title: "Whish" },
+    { src: "/logos/moneygram.png", title: "MoneyGram" },
+  ];
 
   return (
     <section className="w-full bg-gradient-to-b from-muted/50 to-background pb-4">
@@ -73,173 +149,125 @@ export default function CurrencyExchangeHero({
       <div className="container mx-auto px-4 mt-4">
         <div className="flex items-center justify-between mb-4">
           <p className="font-medium">العملة الاساسية</p>
-          <Select value={baseCurrency} onValueChange={setBaseCurrency}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="العملة الاساسية" />
-            </SelectTrigger>
-            <SelectContent>
-              {currencies.map((currency) => (
-                <SelectItem key={currency.id} value={currency.id}>
-                  <Image
-                    className="me-2 rounded"
-                    height={15}
-                    width={30}
-                    src={`/flags/${currency.flag}.svg`}
-                    alt=""
-                  />{" "}
-                  {currency.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <Input
+              onChange={(e) => setAmount(Number(e.target.value))}
+              value={amount}
+              type="number"
+              className="w-42"
+            />
+            <Select value={baseCurrency} onValueChange={setBaseCurrency}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="العملة الاساسية" />
+              </SelectTrigger>
+              <SelectContent>
+                {currencies.map((currency) => (
+                  <SelectItem key={currency.id} value={currency.id}>
+                    <Image
+                      className="me-2 rounded"
+                      height={15}
+                      width={30}
+                      src={`/flags/${currency.flag}.svg`}
+                      alt=""
+                    />{" "}
+                    {currency.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 relative">
-          {currenciesToShow.map((currency) => {
-            const currencyExchange = currentCurrencyExchanges.find(
-              (c) =>
-                c.sourceCurrency.id === baseCurrency &&
-                c.targetCurrency.id === currency.id
-            );
-            if (!currencyExchange) return null;
+          {generateCurrenciesRateMap(currencies, currenciesExchange)
+            [baseCurrency as string].filter(
+              (ex) =>
+                ex.targetCurrency.id === baseCurrency ||
+                ex.sourceCurrency.id === baseCurrency
+            )
+            .map((ex) => {
+              const isTarget = ex.targetCurrency.id === baseCurrency;
+              // const isSource = ex.sourceCurrency.id === baseCurrency;
 
-            const rate = currencyExchange.price;
+              const targetCurrency = isTarget
+                ? currencies.find((c) => c.id === ex.sourceCurrency.id)
+                : currencies.find((c) => c.id === ex.targetCurrency.id);
 
-            const baseSymbol = currencies.find(
-              (c) => c.code === baseCurrency
-            )?.symbol;
-            const shouldInvert = false;
+              const rate = ex.price * amount;
 
-            const displayRate = shouldInvert ? 1 / rate : rate;
-            const displaySellRate = shouldInvert ? 1 / rate : rate;
+              const isSmall = rate < 1;
 
-            return (
-              <Card
-                key={currency.code}
-                className="overflow-hidden border-2 hover:border-primary/50 transition-all  border-green-700"
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <Image
-                        className="me-2"
-                        width={80}
-                        height={60}
-                        src={`/flags/${currency.flag}.svg`}
-                        alt={currency.name}
-                      ></Image>
-                      <div>
-                        <h3 className="font-bold text-xl">{currency.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {currency.code}
-                        </p>
+              return (
+                <Card
+                  key={targetCurrency?.code}
+                  className="overflow-hidden border-2 hover:border-primary/50 transition-all  border-green-700"
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <Image
+                          className="me-2"
+                          width={80}
+                          height={60}
+                          src={`/flags/${targetCurrency?.flag}.svg`}
+                          alt={targetCurrency?.name || ""}
+                        ></Image>
+                        <div>
+                          <h3 className="font-bold text-xl">
+                            {targetCurrency?.name}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {targetCurrency?.code}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <div className="text-2xl">
+                          <span className="ms-2" dir="rtl">
+                            {targetCurrency?.symbol}
+                          </span>
+                          <span>{Number(rate).toFixed(isSmall ? 5 : 2)}</span>
+                          <span className="ms-2 text-green-500 text-sm">
+                            شراء
+                          </span>
+                        </div>
+                        <div className="text-2xl">
+                          <span className="ms-2" dir="rtl">
+                            {targetCurrency?.symbol}
+                          </span>
+                          <span>
+                            {Number(rate + ex.gap * amount).toFixed(
+                              isSmall ? 5 : 2
+                            )}
+                          </span>
+                          <span className="ms-2 text-red-500 text-sm">
+                            مبيع
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <div className="text-2xl">
-                        <span className="ms-2" dir="rtl">
-                          {shouldInvert ? baseSymbol : currency.symbol}
-                        </span>
-                        <span>
-                          {displayRate > 1
-                            ? Number(displayRate).toFixed(2)
-                            : Number(displayRate).toFixed(4)}
-                        </span>
-                        <span className="ms-2 text-green-500 text-sm">
-                          شراء
-                        </span>
-                      </div>
-                      <div className="text-2xl">
-                        <span className="ms-2" dir="rtl">
-                          {shouldInvert ? baseSymbol : currency.symbol}
-                        </span>
-                        <span>
-                          {displaySellRate > 1
-                            ? Number(
-                                displaySellRate + currencyExchange.gap
-                              ).toFixed(2)
-                            : Number(
-                                displaySellRate + currencyExchange.gap
-                              ).toFixed(4)}
-                        </span>
-                        <span className="ms-2 text-red-500 text-sm">مبيع</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  </CardContent>
+                </Card>
+              );
+            })}
         </div>
       </div>
-      <div dir="rtl" className="my-12">
-        <Marquee speed={200}>
-          <div className="flex gap-16 ">
-            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
+      <div dir="ltr" className="my-12">
+        <Marquee speed={200} autoFill>
+          {marqueeLogos.map((logo, index) => (
+            <Card
+              key={index}
+              className="p-1 mx-8 h-[100px] w-[100px] flex items-center justify-center"
+            >
               <Image
-                src="/logos/wu.jpg"
-                alt="us"
+                src={logo.src}
+                alt={logo.title}
                 height={80}
                 width={120}
                 className="object-contain h-full w-auto"
               />
             </Card>
-            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
-              <Image
-                src="/logos/usdt.png"
-                alt="us"
-                height={80}
-                width={120}
-                className="object-contain h-full w-auto"
-              />
-            </Card>
-
-            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
-              <Image
-                src="/logos/bnb.png"
-                alt="us"
-                height={80}
-                width={120}
-                className="object-contain h-full w-auto"
-              />
-            </Card>
-            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
-              <Image
-                src="/logos/sham.png"
-                alt="us"
-                height={80}
-                width={120}
-                className="object-contain h-full w-auto"
-              />
-            </Card>
-            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
-              <Image
-                src="/logos/eth.png"
-                alt="us"
-                height={80}
-                width={120}
-                className="object-contain h-full w-auto"
-              />
-            </Card>
-            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
-              <Image
-                src="/logos/whish.jpg"
-                alt="us"
-                height={80}
-                width={120}
-                className="object-contain h-full w-auto"
-              />
-            </Card>
-            <Card className="p-1 mx-2 h-[100px] w-[100px] flex items-center justify-center">
-              <Image
-                src="/logos/moneygram.png"
-                alt="us"
-                height={80}
-                width={120}
-                className="object-contain h-full w-auto"
-              />
-            </Card>
-          </div>
+          ))}
         </Marquee>
       </div>
       <div className="mt-8 text-center text-sm text-muted-foreground">
