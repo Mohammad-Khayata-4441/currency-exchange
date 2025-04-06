@@ -121,14 +121,19 @@ export default function CurrencyExchangeHero({
   currentDate: string;
 }) {
   // const [reverse, setReverse] = useState(false);
-  const [amount, setAmount] = useState(1);
+  const [amount, setAmount] = useState<number | null>(null);
   const [targetCurrency, setTargetCurrency] = useState(
     currencies.find((c) => c.isMain)?.id
   );
+  const [targetCurrency2, setTargetCurrency2] = useState(
+    currencies.find((c) => c.code === "€")?.id
+  );
+
   const [convertCurrency, setConvertCurrency] = useState(
     currencies.find((c) => c.code === "$")?.id
   );
   const targetCurrencyData = currencies.find((c) => c.id === targetCurrency);
+  const targetCurrencyData2 = currencies.find((c) => c.id === targetCurrency2);
   // Get currencies to display (all except the base currency)
 
   const marqueeLogos = [
@@ -172,9 +177,10 @@ export default function CurrencyExchangeHero({
           </div>
         </div>
       </div>
+
       <div className="container mx-auto px-4 mt-4">
         <div className="flex items-center justify-between mb-4">
-          <p className="font-medium">العملة الاساسية</p>
+          <p className="font-medium text-2xl">العملة الاساسية</p>
           <div className="flex items-center gap-2">
             {/* <Input
               onChange={(e) => setAmount(Number(e.target.value))}
@@ -184,10 +190,11 @@ export default function CurrencyExchangeHero({
             /> */}
             <div className="flex items-center gap-2">
               <span className="text-xl font-semibold">
-                {(generateCurrenciesRateMap(currencies, currenciesExchange)[
-                  targetCurrency as string
-                ].find((ex) => ex.targetCurrency.id === convertCurrency)
-                  ?.price ?? 0) * amount}
+                {amount &&
+                  (generateCurrenciesRateMap(currencies, currenciesExchange)[
+                    targetCurrency as string
+                  ].find((ex) => ex.targetCurrency.id === convertCurrency)
+                    ?.price ?? 0) * amount}
               </span>
               <span>=</span>
             </div>
@@ -197,7 +204,11 @@ export default function CurrencyExchangeHero({
               </SelectTrigger>
               <SelectContent>
                 {currencies.map((currency) => (
-                  <SelectItem key={currency.id} value={currency.id}>
+                  <SelectItem
+                    disabled={currency.id === targetCurrency2}
+                    key={currency.id}
+                    value={currency.id}
+                  >
                     <Image
                       className="me-2 rounded"
                       height={15}
@@ -213,7 +224,7 @@ export default function CurrencyExchangeHero({
             <Input
               type="number"
               className="w-[100px]"
-              value={amount}
+              value={amount ?? ""}
               onChange={(e) => setAmount(Number(e.target.value))}
             />
             <div className="text-xl  ">
@@ -230,7 +241,11 @@ export default function CurrencyExchangeHero({
                   </SelectTrigger>
                   <SelectContent>
                     {currencies.map((currency) => (
-                      <SelectItem key={currency.id} value={currency.id}>
+                      <SelectItem
+                        disabled={currency.id === targetCurrency2}
+                        key={currency.id}
+                        value={currency.id}
+                      >
                         <Image
                           className="me-2 rounded"
                           height={15}
@@ -317,6 +332,162 @@ export default function CurrencyExchangeHero({
             })}
         </div>
       </div>
+
+      <div className="container mx-auto px-4 mt-12">
+        <div className="flex items-center justify-between mb-4">
+          <p className="font-medium text-2xl">العملة الاساسية</p>
+          <div className="flex items-center gap-2">
+            {/* <Input
+              onChange={(e) => setAmount(Number(e.target.value))}
+              value={amount}
+              type="number"
+              className="w-42"
+            /> */}
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-semibold">
+                {amount &&
+                  (generateCurrenciesRateMap(currencies, currenciesExchange)[
+                    targetCurrency2 as string
+                  ].find((ex) => ex.targetCurrency.id === convertCurrency)
+                    ?.price ?? 0) * amount}
+              </span>
+              <span>=</span>
+            </div>
+            <Select value={convertCurrency} onValueChange={setConvertCurrency}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="عملة التحويل" />
+              </SelectTrigger>
+              <SelectContent>
+                {currencies.map((currency) => (
+                  <SelectItem
+                    disabled={currency.id === targetCurrency2}
+                    key={currency.id}
+                    value={currency.id}
+                  >
+                    <Image
+                      className="me-2 rounded"
+                      height={15}
+                      width={30}
+                      src={`/flags/${currency.flag}.svg`}
+                      alt=""
+                    />{" "}
+                    {currency.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input
+              type="number"
+              className="w-[100px]"
+              value={amount ?? ""}
+              onChange={(e) => setAmount(Number(e.target.value))}
+            />
+            <div className="text-xl  ">
+              <ArrowLeftRight />
+            </div>
+            <div>
+              <div>
+                <Select
+                  value={targetCurrency2}
+                  onValueChange={setTargetCurrency2}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="العملة الاساسية" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currencies.map((currency) => (
+                      <SelectItem
+                        disabled={currency.id === targetCurrency2}
+                        key={currency.id}
+                        value={currency.id}
+                      >
+                        <Image
+                          className="me-2 rounded"
+                          height={15}
+                          width={30}
+                          src={`/flags/${currency.flag}.svg`}
+                          alt=""
+                        />{" "}
+                        {currency.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 relative">
+          {generateCurrenciesRateMap(currencies, currenciesExchange)
+            [targetCurrency2 as string].filter(
+              (ex) =>
+                ex.targetCurrency.id === targetCurrency2 ||
+                ex.sourceCurrency.id === targetCurrency2
+            )
+            .map((ex) => {
+              const isTarget = ex.targetCurrency.id === targetCurrency2;
+              // const isSource = ex.sourceCurrency.id === baseCurrency;
+
+              const tc = isTarget
+                ? currencies.find((c) => c.id === ex.sourceCurrency.id)
+                : currencies.find((c) => c.id === ex.targetCurrency.id);
+
+              const rate = ex.price;
+
+              return (
+                <Card
+                  key={tc?.code}
+                  className="overflow-hidden border-2 hover:border-primary/50 transition-all  py-1 border-green-700"
+                >
+                  <CardContent className="p-2">
+                    <div className="flex flex-col items-center justify-between ">
+                      <div className="flex items-center space-x-2 flex-col">
+                        <Image
+                          className="me-2"
+                          width={80}
+                          height={60}
+                          src={`/flags/${tc?.flag}.svg`}
+                          alt={tc?.name || ""}
+                        ></Image>
+                        <div>
+                          <h3 className="font-bold text-xl">{tc?.name}</h3>
+                        </div>
+                      </div>
+                      <div className=" flex items-center justify-between p-2 w-full">
+                        <div className="ms-2 ">
+                          <span className="text-xl ">شراء</span>
+                        </div>
+                        <div className="py-1 px-2 bg-slate-400 rounded text-white text-xl font-bold tracking-[2]">
+                          <span className="me-2 text-base" dir="rtl">
+                            {targetCurrencyData2?.symbol}
+                          </span>
+                          <span className="text-3xl font-semibold">
+                            {format(Number(rate))}
+                          </span>
+                        </div>
+                      </div>
+                      <div className=" flex items-center justify-between p-2 w-full">
+                        <div className="ms-2 ">
+                          <span className="text-xl ">بيع</span>
+                        </div>
+                        <div className="py-1 px-2 bg-blue-500 rounded text-white text-xl font-bold tracking-[2]">
+                          <span className="me-2 text-base" dir="rtl">
+                            {targetCurrencyData2?.symbol}
+                          </span>
+                          <span className="text-3xl font-semibold">
+                            {format(Number(rate + ex.gap))}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+        </div>
+      </div>
+
       <div dir="ltr" className="my-12">
         <Marquee speed={200} autoFill>
           {marqueeLogos.map((logo, index) => (
