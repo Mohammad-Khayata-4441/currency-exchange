@@ -184,10 +184,10 @@ export default function CurrencyExchangeHero({
             /> */}
             <div className="flex items-center gap-2">
               <span className="text-xl font-semibold">
-                {generateCurrenciesRateMap(currencies, currenciesExchange)[
+                {(generateCurrenciesRateMap(currencies, currenciesExchange)[
                   targetCurrency as string
                 ].find((ex) => ex.targetCurrency.id === convertCurrency)
-                  ?.price ?? 0 * amount}
+                  ?.price ?? 0) * amount}
               </span>
               <span>=</span>
             </div>
@@ -263,7 +263,7 @@ export default function CurrencyExchangeHero({
                 ? currencies.find((c) => c.id === ex.sourceCurrency.id)
                 : currencies.find((c) => c.id === ex.targetCurrency.id);
 
-              const rate = ex.price * amount;
+              const rate = ex.price;
 
               return (
                 <Card
