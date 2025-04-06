@@ -8,7 +8,9 @@ export default async function Home() {
   const qsExchange = stringify({
     populate: "*",
   });
-  const currenciesResponse = await fetch(`${API_URL}/currencies`);
+  const currenciesResponse = await fetch(`${API_URL}/currencies`, {
+    cache: "no-cache",
+  });
   const currencyExchangesResponse = await fetch(
     `${API_URL}/currency-exchanges?${qsExchange}`
   );
