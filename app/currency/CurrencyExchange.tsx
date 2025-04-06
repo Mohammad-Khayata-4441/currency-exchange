@@ -332,7 +332,7 @@ export default function CurrencyExchangeHero({
   const [targetCurrency, setTargetCurrency] = useState<string>(
     currencies.find((c) => c.isMain)?.id || ""
   );
-  const [targetCurrency2, setTargetCurrency2] = useState<string>(
+  const [targetCurrency2] = useState<string>(
     currencies.find((c) => c.code === "€")?.id || ""
   );
   const [convertCurrency, setConvertCurrency] = useState<string>(
