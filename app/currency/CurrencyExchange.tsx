@@ -14,6 +14,15 @@ import { Currency, CurrencyExchange } from "./types/currency.types";
 import Marquee from "react-fast-marquee";
 import { ArrowLeftRight, CheckCircle, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // Types
 interface FormatOptions {
@@ -449,18 +458,61 @@ export default function CurrencyExchangeHero({
         />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 relative">
-          {currenciesRateMap[targetCurrency].map((ex) => {
-            return (
-              <CurrencyCard
-                key={ex?.targetCurrency?.code}
-                currency={ex?.targetCurrency}
-                rate={ex.price}
-                gap={ex.gap}
-                targetCurrencySymbol={targetCurrencyData?.symbol}
-              />
-            );
-          })}
+          {currenciesRateMap[targetCurrency]
+            .filter((ex) => !ex.reverse)
+            .map((ex) => {
+              return (
+                <CurrencyCard
+                  key={ex?.targetCurrency?.code}
+                  currency={ex?.targetCurrency}
+                  rate={ex.price}
+                  gap={ex.gap}
+                  targetCurrencySymbol={targetCurrencyData?.symbol}
+                />
+              );
+            })}
         </div>
+
+        <Table className="mt-4">
+          <TableCaption className="text-lg">
+            A list of your recent invoices.
+          </TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]"></TableHead>
+              <TableHead className="text-right text-xl">العملة</TableHead>
+              <TableHead className="text-center text-xl">بيع</TableHead>
+              <TableHead className="text-center text-xl">شراء</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currenciesRateMap[targetCurrency]
+              .filter((ex) => ex.reverse)
+              .map((ex) => (
+                <TableRow key={ex.id}>
+                  <TableCell className="font-medium">
+                    <Image
+                      className="me-2 rounded"
+                      height={15}
+                      width={30}
+                      src={`/flags/${ex.targetCurrency?.flag}.svg`}
+                      alt={ex.targetCurrency?.name || ""}
+                    />
+                  </TableCell>
+
+                  <TableCell className="text-lg">
+                    {ex.targetCurrency.name}
+                  </TableCell>
+                  <TableCell className="text-center text-lg">
+                    {ex.price} {targetCurrencyData?.symbol}
+                  </TableCell>
+                  <TableCell className="text-center text-lg">
+                    {ex.price + ex.gap} {targetCurrencyData?.symbol}
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
       </div>
 
       {/* <div className="container mx-auto px-4 mt-12">
