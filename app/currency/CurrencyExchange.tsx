@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Currency, CurrencyExchange } from "./types/currency.types";
 import Marquee from "react-fast-marquee";
-import { ArrowLeftRight, CheckCircle } from "lucide-react";
+import { ArrowLeftRight, CheckCircle, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 // Types
@@ -169,6 +169,12 @@ const HeroSection: React.FC<HeroSectionProps> = () => (
             <CheckCircle className="w-6 h-6 text-green-500" />
             سحب وايداع من جميع المحفظات الالكترونية وبجميع العملات الرقمية
           </p>
+          <div>
+            <p className="max-w-[700px] text-background md:text-xl flex items-center gap-2">
+              <MapPin className="w-6 h-6 text-green-500" />
+              حلب - الجميلية - شارع جامع الصديق
+            </p>
+          </div>
         </div>
         <div className="flex flex-col items-center justify-end col-span-4">
           <a
