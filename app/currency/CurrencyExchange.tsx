@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Currency, CurrencyExchange } from "./types/currency.types";
 import Marquee from "react-fast-marquee";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, CheckCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 // Types
@@ -152,19 +152,41 @@ const HeroSection: React.FC<HeroSectionProps> = () => (
       <source src="/exchange.mp4"></source>
     </video>
     <div className="flex items-center bg-gray-800/70 absolute left-0 top-0 h-[400px] w-full justify-center z-10">
-      <div className="flex flex-col items-center text-center space-y-4 mb-12">
-        <h1 className="text-3xl text-yellow-400 font-bold tracking-tighter sm:text-4xl md:text-7xl mb-8">
-          الصافي للصرافة والحوالات المالية
-        </h1>
-        <p className="max-w-[700px] text-background md:text-xl">
-          استلام وارسال الحوالات المالية من كافة دول العالم
-        </p>
-        <p className="max-w-[700px] text-background md:text-xl">
-          تصريف دولار ، يورو ، تركي
-        </p>
-        <p className="max-w-[700px] text-background md:text-xl">
-          سحب وايداع من جميع المحفظات الالكترونية وبجميع العملات الرقمية
-        </p>
+      <div className="grid grid-cols-12 container mx-auto max-w-screen-xl">
+        <div className="flex flex-col col-span-8 space-y-4 mb-12">
+          <h1 className="text-3xl text-yellow-400 font-bold tracking-tighter sm:text-4xl md:text-7xl mb-8">
+            الصافي للصرافة والحوالات المالية
+          </h1>
+          <p className="max-w-[700px] text-background md:text-xl flex items-center gap-2">
+            <CheckCircle className="w-6 h-6 text-green-500" />
+            استلام وارسال الحوالات المالية من كافة دول العالم
+          </p>
+          <p className="max-w-[700px] text-background md:text-xl flex items-center gap-2">
+            <CheckCircle className="w-6 h-6 text-green-500" />
+            تصريف جميع العملات الأجنبية (دولار ، يورو ، تركي)
+          </p>
+          <p className="max-w-[700px] text-background md:text-xl flex items-center gap-2">
+            <CheckCircle className="w-6 h-6 text-green-500" />
+            سحب وايداع من جميع المحفظات الالكترونية وبجميع العملات الرقمية
+          </p>
+        </div>
+        <div className="flex flex-col items-center justify-end col-span-4">
+          <a
+            href="https://wa.me/963933333333"
+            className="text-background md:text-xl w-max"
+          >
+            <Image
+              src="/qrcode.svg"
+              className="mx-auto"
+              alt="whatsapp"
+              width={200}
+              height={200}
+            />
+          </a>
+          <p className="text-background md:text-lg mt-4 w-max">
+            تابعنا على واتساب لتصلك الأسعار اول باول 🔥
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -329,12 +351,15 @@ export default function CurrencyExchangeHero({
   currenciesExchange,
 }: CurrencyExchangeHeroProps) {
   const [amount, setAmount] = useState<number | null>(null);
+
   const [targetCurrency, setTargetCurrency] = useState<string>(
     currencies.find((c) => c.isMain)?.id || ""
   );
+
   const [targetCurrency2] = useState<string>(
     currencies.find((c) => c.code === "€")?.id || ""
   );
+
   const [convertCurrency, setConvertCurrency] = useState<string>(
     currencies.find((c) => c.code === "$")?.id || ""
   );
