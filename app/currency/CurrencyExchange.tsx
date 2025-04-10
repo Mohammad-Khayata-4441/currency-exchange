@@ -315,17 +315,23 @@ const CurrencyCard: React.FC<CurrencyCardProps> = ({
       className="overflow-hidden border-2 hover:border-primary/50 transition-all py-1 border-green-700"
     >
       <CardContent className="p-2">
-        <div className="flex flex-col items-center justify-between">
-          <div className="flex items-center space-x-2 flex-col">
+        <div className="flex flex-col ">
+          <div className="flex space-x-2 ps-4 items-center">
             <Image
-              className="me-2"
+              className="me-4 rounded"
               width={80}
-              height={60}
+              height={50}
               src={`/flags/${currency?.flag}.svg`}
               alt={currency?.name || ""}
             />
             <div>
-              <h3 className="font-bold text-xl">{currency?.name}</h3>
+              <h3 className="font-bold text-xl">
+                {currency?.name}{" "}
+                <span className="text-2xl font-normal">
+                  {" "}
+                  ({currency?.code})
+                </span>
+              </h3>
             </div>
           </div>
           <RateDisplay
