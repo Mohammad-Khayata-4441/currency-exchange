@@ -463,18 +463,14 @@ export default function CurrencyExchangeHero({
       <div dir="ltr" className="my-12">
         <Marquee speed={200} autoFill>
           {marqueeLogos.map((logo, index) => (
-            <Card
+            <Image
               key={index}
-              className="p-1 mx-8 h-[100px] w-[100px] flex items-center justify-center"
-            >
-              <Image
-                src={logo.src}
-                alt={logo.title}
-                height={80}
-                width={120}
-                className="object-contain h-full w-auto"
-              />
-            </Card>
+              src={logo.src}
+              alt={logo.title}
+              height={40}
+              width={60}
+              className="object-contain h-full w-auto mx-4"
+            />
           ))}
         </Marquee>
       </div>
