@@ -198,6 +198,18 @@ const HeroSection: React.FC<HeroSectionProps> = () => (
   </div>
 );
 
+const calculateAmount = (
+  amount: number | null,
+  mode: "sell" | "buy",
+  rateMap: CurrencyExchange
+) => {
+  if (!amount || !rateMap) return 0;
+  if (mode === "sell") {
+    return (rateMap?.price + rateMap.gap) * amount;
+  }
+  return rateMap?.price * amount;
+};
+
 const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
   amount,
   setAmount,
@@ -209,46 +221,75 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
   currenciesExchange,
   disabledCurrency,
   label,
-}) => (
-  <div className="flex items-center justify-between mb-4">
-    <p className="font-medium text-2xl">{label}</p>
-    <div className="flex items-center gap-2">
+}) => {
+  const [mode, setMode] = useState<"sell" | "buy">("sell");
+  const rateMap = generateCurrenciesRateMap(currencies, currenciesExchange)[
+    targetCurrency
+  ].find((ex) => ex.targetCurrency?.id === convertCurrency);
+
+  const calculatedAmount = calculateAmount(
+    amount,
+    mode,
+    rateMap as CurrencyExchange
+  );
+
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <p className="font-medium text-2xl">{label}</p>
       <div className="flex items-center gap-2">
-        <span className="text-xl font-semibold">
-          {amount &&
-            (generateCurrenciesRateMap(currencies, currenciesExchange)[
-              targetCurrency
-            ].find((ex) => ex.targetCurrency?.id === convertCurrency)?.price ??
-              0) * amount}
-        </span>
-        <span>=</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xl font-semibold">
+            {calculatedAmount}{" "}
+            {currencies.find((c) => c.id === targetCurrency)?.symbol}
+          </span>
+          <span>=</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            className={`px-3 py-1 rounded- ${
+              mode === "sell" ? "bg-primary text-white" : "bg-gray-200"
+            }`}
+            onClick={() => setMode("sell")}
+          >
+            بيع
+          </button>
+          <button
+            className={`px-3 py-1 rounded-l ${
+              mode === "buy" ? "bg-primary text-white" : "bg-gray-200"
+            }`}
+            onClick={() => setMode("buy")}
+          >
+            شراء
+          </button>
+        </div>
+        <CurrencySelect
+          value={convertCurrency}
+          onChange={setConvertCurrency}
+          currencies={currencies}
+          disabledCurrency={disabledCurrency}
+          placeholder="عملة التحويل"
+        />
+
+        <Input
+          type="number"
+          className="w-[100px]"
+          value={amount ?? ""}
+          onChange={(e) => setAmount(Number(e.target.value))}
+        />
+        <div className="text-xl">
+          <ArrowLeftRight />
+        </div>
+        <CurrencySelect
+          value={targetCurrency}
+          onChange={setTargetCurrency}
+          currencies={currencies}
+          disabledCurrency={disabledCurrency}
+          placeholder="العملة الاساسية"
+        />
       </div>
-      <CurrencySelect
-        value={convertCurrency}
-        onChange={setConvertCurrency}
-        currencies={currencies}
-        disabledCurrency={disabledCurrency}
-        placeholder="عملة التحويل"
-      />
-      <Input
-        type="number"
-        className="w-[100px]"
-        value={amount ?? ""}
-        onChange={(e) => setAmount(Number(e.target.value))}
-      />
-      <div className="text-xl">
-        <ArrowLeftRight />
-      </div>
-      <CurrencySelect
-        value={targetCurrency}
-        onChange={setTargetCurrency}
-        currencies={currencies}
-        disabledCurrency={disabledCurrency}
-        placeholder="العملة الاساسية"
-      />
     </div>
-  </div>
-);
+  );
+};
 
 const CurrencySelect: React.FC<CurrencySelectProps> = ({
   value,
@@ -368,10 +409,6 @@ export default function CurrencyExchangeHero({
     currencies.find((c) => c.isMain)?.id || ""
   );
 
-  const [targetCurrency2] = useState<string>(
-    currencies.find((c) => c.code === "€")?.id || ""
-  );
-
   const [convertCurrency, setConvertCurrency] = useState<string>(
     currencies.find((c) => c.code === "$")?.id || ""
   );
@@ -397,7 +434,7 @@ export default function CurrencyExchangeHero({
     <section className="w-full bg-gradient-to-b from-muted/50 to-background pb-4">
       <HeroSection />
 
-      <div className="container mx-auto px-4 mt-4">
+      <div className="container mx-auto px-4 mt-4 max-w-screen-xl">
         <CurrencyConverter
           amount={amount}
           setAmount={setAmount}
@@ -407,7 +444,7 @@ export default function CurrencyExchangeHero({
           setTargetCurrency={setTargetCurrency}
           currencies={currencies}
           currenciesExchange={currenciesExchange}
-          disabledCurrency={targetCurrency2}
+          disabledCurrency={targetCurrency}
           label="العملة الاساسية"
         />
 
