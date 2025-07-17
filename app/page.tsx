@@ -1,20 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { API_URL } from "@/config/api";
 import CurrencyExchangeHero from "./currency/CurrencyExchange";
-import { stringify } from "qs";
 import {
   QueryClient,
   QueryClientProvider,
   useQuery,
 } from "@tanstack/react-query";
+import { fetchCurrencies, fetchCurrencyExchanges } from "./actions/currency";
 
 // Create a stable QueryClient instance
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchInterval: 1000 * 60 * 2, // Refetch every 5 seconds
+      refetchInterval: 1000 * 60 * 2, // Refetch every 2 minutes
       refetchIntervalInBackground: true,
       staleTime: 0, // Data is always considered stale
       gcTime: 0, // Don't cache data
@@ -27,14 +26,11 @@ const useCurrencies = () => {
   return useQuery({
     queryKey: ["currencies"],
     queryFn: async () => {
-      const response = await fetch(`${API_URL}/currencies`, {
-        cache: "no-store",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch currencies");
+      const result = await fetchCurrencies();
+      if (!result.success) {
+        throw new Error(result.error);
       }
-      const data = await response.json();
-      return data.data;
+      return result.data;
     },
   });
 };
@@ -44,20 +40,11 @@ const useCurrencyExchanges = () => {
   return useQuery({
     queryKey: ["currencyExchanges"],
     queryFn: async () => {
-      const qsExchange = stringify({
-        populate: "*",
-      });
-      const response = await fetch(
-        `${API_URL}/currency-exchanges?${qsExchange}`,
-        {
-          cache: "no-store",
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch currency exchanges");
+      const result = await fetchCurrencyExchanges();
+      if (!result.success) {
+        throw new Error(result.error);
       }
-      const data = await response.json();
-      return data.data;
+      return result.data;
     },
   });
 };
@@ -82,7 +69,7 @@ function CurrencyExchangeApp() {
     isFetching: exchangesFetching,
   } = useCurrencyExchanges();
 
-  // Update current date every 5 seconds
+  // Update current date every 2 minutes
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentDate(new Date().toISOString().split("T")[0]);
