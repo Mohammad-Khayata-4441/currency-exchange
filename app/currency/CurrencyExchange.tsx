@@ -234,7 +234,7 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
   const [mode, setMode] = useState<"sell" | "buy">("sell");
   const rateMap = generateCurrenciesRateMap(currencies, currenciesExchange)[
     targetCurrency
-  ].find((ex) => ex.targetCurrency?.id === convertCurrency);
+  ]?.find((ex) => ex.targetCurrency?.id === convertCurrency);
 
   const calculatedAmount = calculateAmount(
     amount,
@@ -405,12 +405,14 @@ interface CurrencyExchangeHeroProps {
   currencies: Currency[];
   currenciesExchange: CurrencyExchange[];
   currentDate: string;
+  isLoading?: boolean;
 }
 
 export default function CurrencyExchangeHero({
   currencies,
   currentDate,
   currenciesExchange,
+  isLoading = false,
 }: CurrencyExchangeHeroProps) {
   const [amount, setAmount] = useState<number | null>(null);
 
@@ -459,7 +461,7 @@ export default function CurrencyExchangeHero({
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 relative">
           {currenciesRateMap[targetCurrency]
-            .filter((ex) => !ex.reverse)
+            ?.filter((ex) => !ex.reverse)
             .map((ex) => {
               return (
                 <CurrencyCard
@@ -487,7 +489,7 @@ export default function CurrencyExchangeHero({
           </TableHeader>
           <TableBody>
             {currenciesRateMap[targetCurrency]
-              .filter((ex) => ex.reverse)
+              ?.filter((ex) => ex.reverse)
               .map((ex) => (
                 <TableRow key={ex.id}>
                   <TableCell className="font-medium">
@@ -571,7 +573,15 @@ export default function CurrencyExchangeHero({
       </div>
 
       <div className="mt-8 text-center text-sm text-muted-foreground">
-        <p>اخر تحديث للأسعار بتاريخ : {currentDate}</p>
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <p>اخر تحديث للأسعار بتاريخ : {currentDate}</p>
+          {isLoading && (
+            <div className="flex items-center gap-1 text-primary">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+              <span className="text-xs">جاري التحديث...</span>
+            </div>
+          )}
+        </div>
         <p className="mt-1 text-lg">حلب - الجميلية - شارع جامع الصديق</p>
       </div>
     </section>
