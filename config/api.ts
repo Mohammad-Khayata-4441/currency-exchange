@@ -1,4 +1,4 @@
-export const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+export const SERVER_URL = 'http://62.72.19.125:1337'
 
 console.log(SERVER_URL)
 
