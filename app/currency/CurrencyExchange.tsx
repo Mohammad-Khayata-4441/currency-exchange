@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Currency, CurrencyExchange } from "./types/currency.types";
 import Marquee from "react-fast-marquee";
-import { ArrowLeftRight, CheckCircle, MapPin } from "lucide-react";
+import { ArrowLeftRight, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
