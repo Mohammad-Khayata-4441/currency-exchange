@@ -162,8 +162,8 @@ const HeroSection: React.FC<HeroSectionProps> = () => (
     </video>
     <div className="flex items-center bg-gray-800/70 absolute left-0 top-0 h-[400px] w-full justify-center z-10">
       <div className="grid grid-cols-12 container mx-auto max-w-screen-xl">
-        <div className="flex flex-col col-span-8 space-y-4 mb-12">
-          <h1 className="text-3xl text-yellow-400 font-bold tracking-tighter sm:text-4xl md:text-7xl mb-8">
+        <div className="flex flex-col col-span-9 space-y-4 mb-12">
+          {/*        <h1 className="text-3xl text-yellow-400 font-bold tracking-tighter sm:text-4xl md:text-7xl mb-8">
             الصافي للصرافة والحوالات المالية
           </h1>
           <p className="max-w-[700px] text-background md:text-xl flex items-center gap-2">
@@ -177,15 +177,23 @@ const HeroSection: React.FC<HeroSectionProps> = () => (
           <p className="max-w-[700px] text-background md:text-xl flex items-center gap-2">
             <CheckCircle className="w-6 h-6 text-green-500" />
             سحب وايداع من جميع المحفظات الالكترونية وبجميع العملات الرقمية
-          </p>
+          </p> */}
+          <Image
+            src="/logo.png"
+            className="mx-auto w-full"
+            alt="logo"
+            width={1000}
+            height={1000}
+            quality={100}
+          />
           <div>
-            <p className="max-w-[700px] text-background md:text-xl flex items-center gap-2">
+            <p className=" text-background md:text-xl flex items-center gap-2   justify-center">
               <MapPin className="w-6 h-6 text-green-500" />
               حلب - الجميلية - شارع جامع الصديق
             </p>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-end col-span-4">
+        <div className="flex flex-col items-center justify-center col-span-3">
           <a
             href="https://wa.me/963933333333"
             className="text-background md:text-xl w-max"
@@ -194,8 +202,8 @@ const HeroSection: React.FC<HeroSectionProps> = () => (
               src="/qrcode.svg"
               className="mx-auto"
               alt="whatsapp"
-              width={200}
-              height={200}
+              width={150}
+              height={150}
             />
           </a>
           <p className="text-background md:text-lg mt-4 w-max">
@@ -428,7 +436,6 @@ export default function CurrencyExchangeHero({
     currencies,
     currenciesExchange
   );
-  console.log(currenciesRateMap);
   const targetCurrencyData = currencies.find((c) => c.id === targetCurrency);
   // const targetCurrencyData2 = currencies.find((c) => c.id === targetCurrency2);
 
@@ -475,46 +482,49 @@ export default function CurrencyExchangeHero({
             })}
         </div>
 
-        <Table className="mt-4">
-          <TableCaption className="text-lg">
-            A list of your recent invoices.
-          </TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]"></TableHead>
-              <TableHead className="text-right text-xl">العملة</TableHead>
-              <TableHead className="text-center text-xl">بيع</TableHead>
-              <TableHead className="text-center text-xl">شراء</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currenciesRateMap[targetCurrency]
-              ?.filter((ex) => ex.reverse)
-              .map((ex) => (
-                <TableRow key={ex.id}>
-                  <TableCell className="font-medium">
-                    <Image
-                      className="me-2 rounded"
-                      height={15}
-                      width={30}
-                      src={`/flags/${ex.targetCurrency?.flag}.svg`}
-                      alt={ex.targetCurrency?.name || ""}
-                    />
-                  </TableCell>
+        {currenciesRateMap[targetCurrency]?.filter((ex) => ex.reverse).length >
+          0 && (
+          <Table className="mt-4">
+            <TableCaption className="text-lg">
+              A list of your recent invoices.
+            </TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]"></TableHead>
+                <TableHead className="text-right text-xl">العملة</TableHead>
+                <TableHead className="text-center text-xl">بيع</TableHead>
+                <TableHead className="text-center text-xl">شراء</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {currenciesRateMap[targetCurrency]
+                ?.filter((ex) => ex.reverse)
+                .map((ex) => (
+                  <TableRow key={ex.id}>
+                    <TableCell className="font-medium">
+                      <Image
+                        className="me-2 rounded"
+                        height={15}
+                        width={30}
+                        src={`/flags/${ex.targetCurrency?.flag}.svg`}
+                        alt={ex.targetCurrency?.name || ""}
+                      />
+                    </TableCell>
 
-                  <TableCell className="text-lg">
-                    {ex.targetCurrency.name}
-                  </TableCell>
-                  <TableCell className="text-center text-lg">
-                    {ex.price} {targetCurrencyData?.symbol}
-                  </TableCell>
-                  <TableCell className="text-center text-lg">
-                    {ex.price + ex.gap} {targetCurrencyData?.symbol}
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
+                    <TableCell className="text-lg">
+                      {ex.targetCurrency.name}
+                    </TableCell>
+                    <TableCell className="text-center text-lg">
+                      {ex.price} {targetCurrencyData?.symbol}
+                    </TableCell>
+                    <TableCell className="text-center text-lg">
+                      {ex.price + ex.gap} {targetCurrencyData?.symbol}
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       {/* <div className="container mx-auto px-4 mt-12">
