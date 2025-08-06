@@ -186,12 +186,14 @@ const HeroSection: React.FC<HeroSectionProps> = () => (
             height={1000}
             quality={100}
           />
+          {/* 
           <div>
             <p className=" text-background md:text-xl flex items-center gap-2   justify-center">
               <MapPin className="w-6 h-6 text-green-500" />
               حلب - الجميلية - شارع جامع الصديق
             </p>
           </div>
+           */}
         </div>
         <div className="flex flex-col items-center justify-center col-span-3">
           <a
@@ -592,7 +594,7 @@ export default function CurrencyExchangeHero({
             </div>
           )}
         </div>
-        <p className="mt-1 text-lg">حلب - الجميلية - شارع جامع الصديق</p>
+        {/* <p className="mt-1 text-lg">حلب - الجميلية - شارع جامع الصديق</p> */}
       </div>
     </section>
   );
