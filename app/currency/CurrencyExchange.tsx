@@ -11,7 +11,6 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Currency, CurrencyExchange } from "./types/currency.types";
-import Marquee from "react-fast-marquee";
 import { ArrowLeftRight, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -265,17 +264,15 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
         </div>
         <div className="flex items-center gap-2">
           <button
-            className={`px-3 py-1 rounded- ${
-              mode === "sell" ? "bg-primary text-white" : "bg-gray-200"
-            }`}
+            className={`px-3 py-1 rounded- ${mode === "sell" ? "bg-primary text-white" : "bg-gray-200"
+              }`}
             onClick={() => setMode("sell")}
           >
             بيع
           </button>
           <button
-            className={`px-3 py-1 rounded-l ${
-              mode === "buy" ? "bg-primary text-white" : "bg-gray-200"
-            }`}
+            className={`px-3 py-1 rounded-l ${mode === "buy" ? "bg-primary text-white" : "bg-gray-200"
+              }`}
             onClick={() => setMode("buy")}
           >
             شراء
@@ -441,14 +438,7 @@ export default function CurrencyExchangeHero({
   const targetCurrencyData = currencies.find((c) => c.id === targetCurrency);
   // const targetCurrencyData2 = currencies.find((c) => c.id === targetCurrency2);
 
-  const marqueeLogos: MarqueeLogoProps[] = [
-    { src: "/logos/wu.jpg", title: "Western Union" },
-    { src: "/logos/usdt.png", title: "USDT" },
-    { src: "/logos/bnb.png", title: "BNB" },
-    { src: "/logos/sham.png", title: "Sham" },
-    { src: "/logos/whish.jpg", title: "Whish" },
-    { src: "/logos/moneygram.png", title: "MoneyGram" },
-  ];
+
 
   return (
     <section className="w-full bg-gradient-to-b from-muted/50 to-background pb-4">
@@ -486,47 +476,47 @@ export default function CurrencyExchangeHero({
 
         {currenciesRateMap[targetCurrency]?.filter((ex) => ex.reverse).length >
           0 && (
-          <Table className="mt-4">
-            <TableCaption className="text-lg">
-              A list of your recent invoices.
-            </TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]"></TableHead>
-                <TableHead className="text-right text-xl">العملة</TableHead>
-                <TableHead className="text-center text-xl">بيع</TableHead>
-                <TableHead className="text-center text-xl">شراء</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currenciesRateMap[targetCurrency]
-                ?.filter((ex) => ex.reverse)
-                .map((ex) => (
-                  <TableRow key={ex.id}>
-                    <TableCell className="font-medium">
-                      <Image
-                        className="me-2 rounded"
-                        height={15}
-                        width={30}
-                        src={`/flags/${ex.targetCurrency?.flag}.svg`}
-                        alt={ex.targetCurrency?.name || ""}
-                      />
-                    </TableCell>
+            <Table className="mt-4">
+              <TableCaption className="text-lg">
+                A list of your recent invoices.
+              </TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]"></TableHead>
+                  <TableHead className="text-right text-xl">العملة</TableHead>
+                  <TableHead className="text-center text-xl">بيع</TableHead>
+                  <TableHead className="text-center text-xl">شراء</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currenciesRateMap[targetCurrency]
+                  ?.filter((ex) => ex.reverse)
+                  .map((ex) => (
+                    <TableRow key={ex.id}>
+                      <TableCell className="font-medium">
+                        <Image
+                          className="me-2 rounded"
+                          height={15}
+                          width={30}
+                          src={`/flags/${ex.targetCurrency?.flag}.svg`}
+                          alt={ex.targetCurrency?.name || ""}
+                        />
+                      </TableCell>
 
-                    <TableCell className="text-lg">
-                      {ex.targetCurrency.name}
-                    </TableCell>
-                    <TableCell className="text-center text-lg">
-                      {ex.price} {targetCurrencyData?.symbol}
-                    </TableCell>
-                    <TableCell className="text-center text-lg">
-                      {ex.price + ex.gap} {targetCurrencyData?.symbol}
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        )}
+                      <TableCell className="text-lg">
+                        {ex.targetCurrency.name}
+                      </TableCell>
+                      <TableCell className="text-center text-lg">
+                        {ex.price} {targetCurrencyData?.symbol}
+                      </TableCell>
+                      <TableCell className="text-center text-lg">
+                        {ex.price + ex.gap} {targetCurrencyData?.symbol}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          )}
       </div>
 
       {/* <div className="container mx-auto px-4 mt-12">
@@ -569,20 +559,7 @@ export default function CurrencyExchangeHero({
         </div>
       </div> */}
 
-      <div dir="ltr" className="my-12">
-        <Marquee speed={200} autoFill>
-          {marqueeLogos.map((logo, index) => (
-            <Image
-              key={index}
-              src={logo.src}
-              alt={logo.title}
-              height={40}
-              width={60}
-              className="object-contain h-full w-auto mx-4"
-            />
-          ))}
-        </Marquee>
-      </div>
+
 
       <div className="mt-8 text-center text-sm text-muted-foreground">
         <div className="flex items-center justify-center gap-2 mb-2">
