@@ -11,7 +11,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Currency, CurrencyExchange } from "./types/currency.types";
-import { ArrowLeftRight, MapPin } from "lucide-react";
+import { ArrowLeftRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -69,10 +69,7 @@ interface HeroSectionProps {
   description?: string;
 }
 
-interface MarqueeLogoProps {
-  src: string;
-  title: string;
-}
+
 
 // Utility functions
 const format = ({ value, separator = "," }: FormatOptions): string => {
