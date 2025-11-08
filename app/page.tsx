@@ -9,11 +9,12 @@ import {
 } from "@tanstack/react-query";
 import { fetchCurrencies, fetchCurrencyExchanges } from "./actions/currency";
 
+const POLLING_DURATION = 1000 * 60 * 60; // 1 hour
 // Create a stable QueryClient instance
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchInterval: 1000 * 60 * 2, // Refetch every 2 minutes
+      refetchInterval: POLLING_DURATION, // Refetch every 2 minutes
       refetchIntervalInBackground: true,
       staleTime: 0, // Data is always considered stale
       gcTime: 0, // Don't cache data
@@ -73,7 +74,7 @@ function CurrencyExchangeApp() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentDate(new Date().toISOString().split("T")[0]);
-    }, 1000 * 60 * 2);
+    }, POLLING_DURATION);
 
     return () => clearInterval(interval);
   }, []);
