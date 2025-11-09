@@ -410,6 +410,7 @@ interface CurrencyExchangeHeroProps {
   currenciesExchange: CurrencyExchange[];
   currentDate: string;
   isLoading?: boolean;
+  onRefresh?: () => void;
 }
 
 export default function CurrencyExchangeHero({
@@ -417,6 +418,7 @@ export default function CurrencyExchangeHero({
   currentDate,
   currenciesExchange,
   isLoading = false,
+  onRefresh,
 }: CurrencyExchangeHeroProps) {
   const [amount, setAmount] = useState<number | null>(null);
 
@@ -473,7 +475,7 @@ export default function CurrencyExchangeHero({
 
         {currenciesRateMap[targetCurrency]?.filter((ex) => ex.reverse).length >
           0 && (
-            <Table className="mt-4">
+            <Table className="mt-4 overflow-hidden">
               <TableCaption className="text-lg">
                 A list of your recent invoices.
               </TableCaption>
@@ -568,6 +570,15 @@ export default function CurrencyExchangeHero({
             </div>
           )}
         </div>
+        {onRefresh && (
+          <button
+            onClick={onRefresh}
+            disabled={isLoading}
+            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "جاري التحديث..." : "تحديث الأسعار الآن"}
+          </button>
+        )}
         {/* <p className="mt-1 text-lg">حلب - الجميلية - شارع جامع الصديق</p> */}
       </div>
     </section>

@@ -9,7 +9,9 @@ import {
 } from "@tanstack/react-query";
 import { fetchCurrencies, fetchCurrencyExchanges } from "./actions/currency";
 
-const POLLING_DURATION = 1000 * 60 * 60; // 1 hour
+// MAXIMUM 4K requests per month
+
+const POLLING_DURATION = 1000 * 60 * 2000; // 2 hour
 // Create a stable QueryClient instance
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,6 +63,7 @@ function CurrencyExchangeApp() {
     isLoading: currenciesLoading,
     error: currenciesError,
     isFetching: currenciesFetching,
+    refetch: refetchCurrencies,
   } = useCurrencies();
 
   const {
@@ -68,7 +71,13 @@ function CurrencyExchangeApp() {
     isLoading: exchangesLoading,
     error: exchangesError,
     isFetching: exchangesFetching,
+    refetch: refetchExchanges,
   } = useCurrencyExchanges();
+
+  const handleManualRefresh = async () => {
+    setCurrentDate(new Date().toISOString().split("T")[0]);
+    await Promise.all([refetchCurrencies(), refetchExchanges()]);
+  };
 
   // Update current date every 2 minutes
   useEffect(() => {
@@ -90,7 +99,7 @@ function CurrencyExchangeApp() {
           </h2>
           <p className="text-muted-foreground mt-2">يرجى الانتظار قليلاً</p>
           <div className="mt-4 text-sm text-muted-foreground">
-            <p>سيتم تحديث البيانات تلقائياً كل دقيقتين</p>
+            <p>سيتم تحديث البيانات تلقائياً كل ساعتين</p>
           </div>
         </div>
       </div>
@@ -131,6 +140,7 @@ function CurrencyExchangeApp() {
       currenciesExchange={currencyExchanges}
       currentDate={currentDate}
       isLoading={currenciesFetching || exchangesFetching}
+      onRefresh={handleManualRefresh}
     />
   );
 }
