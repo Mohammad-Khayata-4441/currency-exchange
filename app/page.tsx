@@ -11,12 +11,12 @@ import { fetchCurrencies, fetchCurrencyExchanges } from "./actions/currency";
 
 // MAXIMUM 4K requests per month
 
-const POLLING_DURATION = 1000 * 60 * 2000; // 2 hour
+const POLLING_DURATION = 1000 * 60 * 300; // 30 minutes
 // Create a stable QueryClient instance
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchInterval: POLLING_DURATION, // Refetch every 2 minutes
+      refetchInterval: POLLING_DURATION, // Refetch every 30 minutes
       refetchIntervalInBackground: true,
       staleTime: 0, // Data is always considered stale
       gcTime: 0, // Don't cache data
