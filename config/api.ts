@@ -1,4 +1,4 @@
-export const SERVER_URL = 'https://brave-power-b24ea83f62.strapiapp.com'
+export const SERVER_URL = 'http://195.35.11.160:1337'
 
 console.log(SERVER_URL)
 
